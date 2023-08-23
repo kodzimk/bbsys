@@ -42,6 +42,8 @@ void user_create(Function^ connecter = gcnew Function())
 
 
     do {
+
+        system("cls");
         cout << "ID: " << account->nameOfCreditCard << endl;
         cout << "Name: " << name << endl;
         cout << "Balance: " << account->balance << endl;
@@ -49,11 +51,12 @@ void user_create(Function^ connecter = gcnew Function())
         cout << "Credit: " << account->creditBalance << endl;
         cout << "Password: " << password1 << endl;
 
-        printf("\nEnter '1' to send a money\n");
-        printf("Enter '0' to exit\n");
+        printf("\nEnter '0' to exit\n");
+        printf("Enter '1' to send a money\n");
         printf("Enter '2' take money from deposit\n");
         printf("Enter '3' to take credit\n");
         printf("Enter '4' to pay for credit\n");
+        printf("Enter '5' to expand deposit\n");
         printf("Please Enter number: ");
         cin >> number2;
 
@@ -63,18 +66,35 @@ void user_create(Function^ connecter = gcnew Function())
             printf("Enter creditId: ");
             cin >> credit;
 
+            account->balance = connecter->sendMoney(credit, account->balance);
         }
         else if (number2 == 2)
         {
             account->TakeMoneyFromDeposit();
+            connecter->DeleteFromDB(account->nameOfCreditCard);
+            connecter->Insert(account->nameOfCreditCard,account->name,account->balance,account->depositBalance,account->creditBalance,
+            account->password);
         }
         else if (number2 == 3)
         {
             account->takeMoneyFromCredit();
+            connecter->DeleteFromDB(account->nameOfCreditCard);
+            connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance,
+            account->password);
         }
         else if (number2 == 4)
         {
             account->payForCredit();
+            connecter->DeleteFromDB(account->nameOfCreditCard);
+            connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance,
+              account->password);
+        }
+        else if (number2 == 5)
+        {
+            account->giveMoneToDeposit();
+            connecter->DeleteFromDB(account->nameOfCreditCard);
+            connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance,
+                account->password);
         }
 
     } while (number2 != 0);
@@ -98,7 +118,7 @@ void loginUser(Function^ connecter = gcnew Function(), Account^ account = gcnew 
 
     SqlDataReader^ reader = command->ExecuteReader();
 
-    
+    bool isHailed = false;
     while (reader->Read())
     {
         String^ name1 = gcnew String(name.c_str());
@@ -111,55 +131,85 @@ void loginUser(Function^ connecter = gcnew Function(), Account^ account = gcnew 
             account->creditBalance = Convert::ToInt32(reader["Credit"]);
             account->nameOfCreditCard = Convert::ToInt32(reader["creditId"]);
             account->password = reader["password"]->ToString();
+            isHailed = true;
             printf("Succefully enter", account->name, "\n\n");
         }
     }
-    int number = 0;
-    string name2 =" ";
-    string password1;
-    MarshalString(account->name, name2);
-    MarshalString(account->password, password1);
 
-    do {
+    if (isHailed == true)
+    {
+        int number = 0;
+        string name2 = " ";
+        string password1;
+        MarshalString(account->name, name2);
+        MarshalString(account->password, password1);
 
-        cout << "ID: " << account->nameOfCreditCard << endl;
-        cout << "Name: " <<name2<<endl;
-        cout << "Balance: " << account->balance<<endl;
-        cout << "Deposit: " << account->depositBalance << endl;
-        cout << "Credit: " << account->creditBalance << endl;
-        cout << "Password: " << password1 << endl;
-
-        printf("\nEnter '1' to send a money\n");
-        printf("Enter '0' to exit\n");
-        printf("Enter '2' take money from deposit\n");
-        printf("Enter '3' to take credit\n");
-        printf("Enter '4' to pay for credit\n");
-        printf("Please Enter number: ");
-        cin >> number;
-
-        if (number == 1)
-        {
-            int id = 0;
-            printf("Enter id: ");
-            cin >> id;
-
-            connecter->sendMoney(id,account->balance);
-        }
-        else if (number == 2)
-        {
-            account->TakeMoneyFromDeposit();
-        }
-        else if (number == 3)
-        {
-            account->takeMoneyFromCredit();
-        }
-        else if (number == 4)
-        {
-            account->payForCredit();
-        }
+        do {
+            system("cls");
+            cout << "ID: " << account->nameOfCreditCard << endl;
+            cout << "Name: " << name2 << endl;
+            cout << "Balance: " << account->balance << endl;
+            cout << "Deposit: " << account->depositBalance << endl;
+            cout << "Credit: " << account->creditBalance << endl;
+            cout << "Password: " << password1 << endl;
 
 
-    } while (number != 0);
+            printf("\nEnter '0' to exit\n");
+            printf("Enter '1' to send a money\n");
+            printf("Enter '2' take money from deposit\n");
+            printf("Enter '3' to take credit\n");
+            printf("Enter '4' to pay for credit\n");
+            printf("Enter '5' to give money for deposit\n");
+            printf("Please Enter number: ");
+            cin >> number;
+
+            if (number == 1)
+            {
+                int id = 0;
+                printf("Enter id: ");
+                cin >> id;
+
+               account->balance= connecter->sendMoney(id, account->balance);
+               connecter->DeleteFromDB(account->nameOfCreditCard);
+               connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance, account->password);
+
+            }
+            else if (number == 2)
+            {
+                account->TakeMoneyFromDeposit();
+                connecter->DeleteFromDB(account->nameOfCreditCard);
+                connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance,
+                    account->password);
+            }
+            else if (number == 3)
+            {
+                account->takeMoneyFromCredit();
+                connecter->DeleteFromDB(account->nameOfCreditCard);
+                connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance,
+                    account->password);
+            }
+            else if (number == 4)
+            {
+                account->payForCredit();
+                connecter->DeleteFromDB(account->nameOfCreditCard);
+                connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance,
+                    account->password);
+            }
+            else if (number == 5)
+            {
+                account->giveMoneToDeposit();
+                connecter->DeleteFromDB(account->nameOfCreditCard);
+                connecter->Insert(account->nameOfCreditCard, account->name, account->balance, account->depositBalance, account->creditBalance,
+                    account->password);
+            }
+
+
+        } while (number != 0);
+    }
+    else {
+        printf("Cant find user!!!\n");
+        return;
+    }
 
 }
 

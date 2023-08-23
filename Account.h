@@ -38,16 +38,7 @@ public:
 		int creditCard = 4000;
 		int f = rand() % 999;
 	    creditCard += f;
-
-	}
-	void Prisvoit(Account account)
-	{
-		name = account.name;
-		balance = account.balance;
-		creditBalance = account.creditBalance;
-		depositBalance = account.depositBalance;
-		password = account.password;
-		nameOfCreditCard = account.nameOfCreditCard;
+		nameOfCreditCard = creditCard;
 
 	}
 	Account()
@@ -75,14 +66,15 @@ public:
 
 	void takeMoneyFromCredit()
 	{
-		if (creditBalance <= 0)
+		if (creditBalance == 0)
 		{
 			int count = 0;
-			std::cout << "Enter you money that you want get max 10000: ";
+			std::cout << "Credit with 1.2% Enter you money that you want get max 10000: ";
 			cin >> count;
 			if (count <= 10000)
 			{
-				creditBalance += creditBalance;
+				creditBalance = creditBalance + (count *1.2);
+				balance += count;
 			}
 			else
 			{
@@ -101,6 +93,7 @@ public:
 		{
 			int count = 0;
 			cout << "Enter '1' to pay with balacne or '2' from deposit: ";
+			cin >> count;
 			if (count == 1)
 			{
 				std::cout << "Enter amount of money: ";
@@ -134,6 +127,21 @@ public:
 		else {
 			cout << "You havent credit rigth now!!!\n";
 		}
+	}
+	void giveMoneToDeposit()
+	{
+		int amount = 0;
+		std::cout << "Enter amount that you wanna give to deposit: ";
+		cin >> amount;
+
+		if (amount <= balance)
+		{
+			depositBalance += amount;
+			balance -= amount;
+		}
+		else
+			std::cout << "Dont enough money!!!\n";
+
 	}
 };
 
