@@ -1,8 +1,8 @@
 ﻿#include "pch.h"
 #include<iostream>
-#include"Login.h"
 #include"Function.h"
 #include"Account.h"
+
 
 using namespace std;
 using namespace System;
@@ -13,20 +13,182 @@ using namespace Data::SqlTypes;
 using namespace System::Data;
 
 
+void MarshalString(String^ s, string& os) {
+    using namespace Runtime::InteropServices;
+    const char* chars =
+        (const char*)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
+    os = chars;
+    Marshal::FreeHGlobal(IntPtr((void*)chars));
+}
+
+void user_create(Function^ connecter = gcnew Function())
+{
+    string a;
+    string pass;
+    std::cout << "Enter your nicnName: ";
+    cin >> a;
+    std::cout << "Create you password: ";
+    cin >> pass;
+    String^ b = gcnew String(a.c_str());
+    String^ pass1 = gcnew String(pass.c_str());
+    Account^ account = gcnew Account(b, 100, 0, 0, pass1);
+    connecter->Insert(account->nameOfCreditCard,account->name,account->balance,account->depositBalance,
+      account->creditBalance  ,account->password);
+    
+    int number2 = 0;
+    string name, password1;
+    MarshalString(account->name, name);
+    MarshalString(account->password, password1);
 
 
+    do {
+        cout << "ID: " << account->nameOfCreditCard << endl;
+        cout << "Name: " << name << endl;
+        cout << "Balance: " << account->balance << endl;
+        cout << "Deposit: " << account->depositBalance << endl;
+        cout << "Credit: " << account->creditBalance << endl;
+        cout << "Password: " << password1 << endl;
 
-//Data Source = LAPTOP - VK8D2UTK; Initial Catalog = Bank; Integrated Security = True
+        printf("\nEnter '1' to send a money\n");
+        printf("Enter '0' to exit\n");
+        printf("Enter '2' take money from deposit\n");
+        printf("Enter '3' to take credit\n");
+        printf("Enter '4' to pay for credit\n");
+        printf("Please Enter number: ");
+        cin >> number2;
+
+        if (number2 == 1)
+        {
+            int credit = 0;
+            printf("Enter creditId: ");
+            cin >> credit;
+
+        }
+        else if (number2 == 2)
+        {
+            account->TakeMoneyFromDeposit();
+        }
+        else if (number2 == 3)
+        {
+            account->takeMoneyFromCredit();
+        }
+        else if (number2 == 4)
+        {
+            account->payForCredit();
+        }
+
+    } while (number2 != 0);
+}
+
+void loginUser(Function^ connecter = gcnew Function(), Account^ account = gcnew Account("", 0, 0, 0, ""))
+{
+    string name;
+    string password;
+    printf("Enter nickname:");
+    cin >> name;
+    printf("Enter password:");
+    cin >> password;
+
+    connecter->ConnectToDb();
+
+    String^ cmdtext = "SELECT * FROM dbo.Account";
+    SqlCommand^ command = gcnew SqlCommand(cmdtext, connecter->conn);
+
+    connecter->conn->Open();
+
+    SqlDataReader^ reader = command->ExecuteReader();
+
+    
+    while (reader->Read())
+    {
+        String^ name1 = gcnew String(name.c_str());
+        String^ passwrod2 = gcnew String(password.c_str());
+        if (reader["Name"]->ToString() == name1 && reader["password"]->ToString() == passwrod2)
+        {
+            account->name = reader["Name"]->ToString();
+            account->balance = Convert::ToInt32(reader["Balance"]);
+            account->depositBalance = Convert::ToInt32(reader["Deposit"]);
+            account->creditBalance = Convert::ToInt32(reader["Credit"]);
+            account->nameOfCreditCard = Convert::ToInt32(reader["creditId"]);
+            account->password = reader["password"]->ToString();
+            printf("Succefully enter", account->name, "\n\n");
+        }
+    }
+    int number = 0;
+    string name2 =" ";
+    string password1;
+    MarshalString(account->name, name2);
+    MarshalString(account->password, password1);
+
+    do {
+
+        cout << "ID: " << account->nameOfCreditCard << endl;
+        cout << "Name: " <<name2<<endl;
+        cout << "Balance: " << account->balance<<endl;
+        cout << "Deposit: " << account->depositBalance << endl;
+        cout << "Credit: " << account->creditBalance << endl;
+        cout << "Password: " << password1 << endl;
+
+        printf("\nEnter '1' to send a money\n");
+        printf("Enter '0' to exit\n");
+        printf("Enter '2' take money from deposit\n");
+        printf("Enter '3' to take credit\n");
+        printf("Enter '4' to pay for credit\n");
+        printf("Please Enter number: ");
+        cin >> number;
+
+        if (number == 1)
+        {
+            int id = 0;
+            printf("Enter id: ");
+            cin >> id;
+
+            connecter->sendMoney(id,account->balance);
+        }
+        else if (number == 2)
+        {
+            account->TakeMoneyFromDeposit();
+        }
+        else if (number == 3)
+        {
+            account->takeMoneyFromCredit();
+        }
+        else if (number == 4)
+        {
+            account->payForCredit();
+        }
+
+
+    } while (number != 0);
+
+}
 
 int main()
 {
-    Function connecter;
-    Account user("", 1000, 0, 0);
-    Login login("123", "Kaisar");
-  
-    String^ stroka;
+    Function^ connecter = gcnew Function();
+    Account^ account1 = gcnew Account("",0,0,0,"");
 
-    printf("SAJXMAJSA");
+    int number = 0;
+    do {
+
+        printf("Enter '0' to exit\n");
+        printf("Enter '1' create a user\n");
+        printf("Enter '2' to login user\n");
+        printf("Enter number: ");
+        cin >> number;
+
+        if (number == 1)
+        {
+            user_create(connecter);
+        }
+        else if (number == 2)
+        {
+            loginUser(connecter, account1);
+        }
+        
+    } while (number != 0);
+    
+
     
 
     return 0;

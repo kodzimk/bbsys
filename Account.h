@@ -1,9 +1,18 @@
 #pragma once
 #include<iostream>
 #include <stdlib.h>
+#include "pch.h"
+#include<string>
 #include<time.h>
 
 using namespace std;
+using namespace System;
+using namespace Data;
+using namespace Data::Sql;
+using namespace Data::SqlClient;
+using namespace Data::SqlTypes;
+using namespace System::Data;
+
 
 
 ref class Account
@@ -14,18 +23,36 @@ public:
 	int depositBalance = 0;
 	int creditBalance = 0;
 	int nameOfCreditCard;
+	System::String^ password;
 
-	Account(System::String^  name, int balance, int depositBalance, int creditBalance) {
+	Account(System::String^  name, int balance, int depositBalance, int creditBalance,System::String^ password) {
+
 		srand(time(NULL));
+
 		this->name = name;
 		this->balance = balance;
 		this->depositBalance = depositBalance;
 		this->creditBalance = creditBalance;
+		this->password = password;
 
 		int creditCard = 4000;
 		int f = rand() % 999;
 	    creditCard += f;
-		nameOfCreditCard = creditCard;
+
+	}
+	void Prisvoit(Account account)
+	{
+		name = account.name;
+		balance = account.balance;
+		creditBalance = account.creditBalance;
+		depositBalance = account.depositBalance;
+		password = account.password;
+		nameOfCreditCard = account.nameOfCreditCard;
+
+	}
+	Account()
+	{
+
 	}
 
 	void TakeMoneyFromDeposit() {

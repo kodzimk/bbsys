@@ -1,5 +1,7 @@
 #pragma once
 #include<iostream>
+#include"Account.h"
+#include"Login.h"
 #include<string>
 
 using namespace std;
@@ -79,6 +81,71 @@ public:
         }
         else
             printf("Failed deleting!!!\n");
+    }
+
+    void readATable(String^ name,Account account)
+    {
+        ConnectToDb();
+
+        String^ cmdText = "SELECT * FROM dbo.Account";
+        SqlCommand^ cmd = gcnew SqlCommand(cmdText, conn);
+        conn->Open();
+        SqlDataReader^ reader = cmd->ExecuteReader();
+
+        while (reader->Read())
+        {
+            if (name == reader["Name"]->ToString())
+            {
+                name = reader["Name"]->ToString();
+                account.name = name;
+                account.balance = Convert::ToInt32(reader["Balance"]);
+                account.creditBalance = Convert::ToInt32(reader["Credit"]);
+                account.depositBalance = Convert::ToInt32(reader["Deposit"]);
+                account.nameOfCreditCard = Convert::ToInt32(reader["creditId"]);
+                account.password = reader["password"]->ToString();
+                break;
+            }
+        }
+        conn->Close();
+    }
+
+    void sendMoney(int creditid,int money)
+    {
+        ConnectToDb();
+
+        String^ cmdText = "SELECT * FROM dbo.Account";
+        SqlCommand^ cmd = gcnew SqlCommand(cmdText, conn);
+        conn->Open();
+        SqlDataReader^ reader = cmd->ExecuteReader();
+        bool isFind = 0;
+
+        while (reader->Read()) {
+
+            if (creditid == Convert::ToInt32(reader["creditId"]))
+            {
+                int amount = 0;
+                printf("Enter amount of money: ");
+                cin >> amount;
+                if (amount <= money)
+                {
+                    Account^ account = gcnew Account("", 0, 0, 0, "");
+                    account->name = reader["Name"]->ToString();
+                    account->balance = Convert::ToInt32(reader["Balance"]);
+                    account->creditBalance = Convert::ToInt32(reader["Credit"]);
+                    account->depositBalance = Convert::ToInt32(reader["Deposit"]);
+                    account->nameOfCreditCard = Convert::ToInt32(reader["creditId"]);
+                    account->password = reader["password"]->ToString();
+                    DeleteFromDB(creditid);
+                    Insert(creditid,account->name,account->balance,account->depositBalance,account->creditBalance,account->password);
+                    printf("Succefully sended!!!\n");
+                }
+                else {
+                    printf("Dont have enoguh money!!!\n");
+                    break;
+                }
+            }
+        }
+        conn->Close();
     }
 
 
