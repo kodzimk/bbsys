@@ -26,7 +26,7 @@ int main()
   
     String^ stroka;
 
-   
+    printf("SAJXMAJSA");
     
 
     return 0;
